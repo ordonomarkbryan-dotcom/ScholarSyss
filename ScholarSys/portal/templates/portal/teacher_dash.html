@@ -1,0 +1,449 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScholarSys+ | Teacher Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-black: #000000;
+            --bg-white: #ffffff;
+            --bg-light: #f9fafb;
+            --text-main: #111827;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-light);
+            display: flex;
+            height: 100vh;
+            color: var(--text-main);
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 240px;
+            background: var(--primary-black);
+            color: white;
+            padding: 1.5rem 1rem;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1000;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .sidebar.collapsed {
+            width: 0;
+            padding: 0;
+            margin: 0;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: -240px;
+                height: 100vh;
+                width: 240px;
+                z-index: 2000;
+                opacity: 1;
+                visibility: visible;
+                pointer-events: auto;
+            }
+
+            .sidebar.active {
+                left: 0;
+                box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+            }
+
+            .sidebar.collapsed {
+                width: 240px;
+                left: -240px;
+                opacity: 1;
+                visibility: visible;
+            }
+        }
+
+        .sidebar-header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .sidebar h2 {
+            font-weight: 800;
+            margin: 0;
+            letter-spacing: -2px;
+            color: white;
+            font-size: 1.6rem;
+            white-space: nowrap;
+        }
+
+        .sidebar nav {
+            flex: 1;
+        }
+
+        .sidebar nav a {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.8rem 1rem;
+            margin-bottom: 0.2rem;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: 0.2s;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        .sidebar nav a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .logout-link {
+            background: #ef4444;
+            color: white !important;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 1.5rem 2.5rem;
+            overflow-y: auto;
+        }
+
+        .top-bar {
+            background: white;
+            padding: 1.25rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .burger-menu {
+            background: transparent;
+            color: white;
+            border: none;
+            padding: 0.4rem;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .burger-menu:hover {
+            opacity: 0.9;
+        }
+
+        .top-bar h1 {
+            margin: 0;
+            font-weight: 800;
+            font-size: 1.35rem;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+        }
+
+        .card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .card h3 {
+            margin-top: 0;
+            color: var(--text-main);
+            font-weight: 800;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.8rem;
+            margin-bottom: 1.2rem;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+        }
+
+        .class-card {
+            background: var(--bg-light);
+            padding: 1.2rem;
+            border-radius: 10px;
+            text-align: center;
+            color: var(--text-main);
+            font-weight: 700;
+            border: 2px solid var(--border-color);
+            transition: 0.2s;
+        }
+
+        .class-card:hover {
+            border-color: var(--primary-black);
+            background: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; padding: 0 0.5rem;">
+            <h2 style="margin: 0; font-size: 1.6rem; letter-spacing: -2px;">
+                <span style="color: white;">Scholar</span><span style="color: #6b7280;">Sys+</span>
+            </h2>
+            <button class="burger-menu" id="sidebarBurger">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+        <nav>
+            <a href="#" data-section="dashboard" class="active"><i class="fa-solid fa-house"></i> <span>Dashboard</span></a>
+            <a href="#" data-section="classrooms"><i class="fa-solid fa-chalkboard"></i> <span>My Classes</span></a>
+            <a href="{% url 'student_list' %}"><i class="fa-solid fa-user-graduate"></i> <span>Students</span></a>
+            <a href="{% url 'submissions_list' %}"><i class="fa-solid fa-file-import"></i> <span>Student Submissions</span></a>
+            <a href="{% url 'calculate_grade' %}"><i class="fa-solid fa-calculator"></i> <span>Grade Calculator</span></a>
+            <a href="{% url 'raw_scores' %}"><i class="fa-solid fa-file-invoice"></i> <span>Raw Score Report</span></a>
+            <a href="#" data-section="messages"><i class="fa-solid fa-envelope"></i> <span>Messages</span></a>
+            <a href="#" data-section="profile"><i class="fa-solid fa-user-gear"></i> <span>Profile</span></a>
+            <a href="{% url 'logout' %}" class="logout-link"
+                style="color: white; text-decoration: none; padding: 0.8rem; background: #ef4444; border-radius: 8px; text-align: center; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 1rem;">
+                <i class="fa-solid fa-right-from-bracket"></i> <span>Logout</span>
+            </a>
+            {% if user.is_staff or user.userprofile.role == 'admin' %}
+            <a href="/admin/" style="background: rgba(255,255,255,0.1); margin-top: 2rem;"><i
+                    class="fa-solid fa-shield-halved"></i> <span>Admin Panel</span></a>
+            {% endif %}
+            {% if user.userprofile.role == 'admin' %}
+            <a href="{% url 'admin_dash' %}" style="background: rgba(255, 255, 255, 0.1); color: white;"><i
+                    class="fa-solid fa-gauge-high"></i> <span>Admin Dashboard</span></a>
+            {% endif %}
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="top-bar">
+            <div style="display: flex; align-items: center;">
+                <button class="burger-menu" id="headerBurger" style="background: var(--primary-black); margin-right: 1.2rem; display: none;">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <h1 id="sectionTitle">Teacher Dashboard</h1>
+            </div>
+            <div style="text-align: right;">
+                <span style="font-weight: 600;">{{ user.userprofile.formatted_name }}</span><br>
+                <span style="font-size: 0.8rem; color: #6b7280;">Teacher Portal</span>
+        </div>
+
+        <div id="section-dashboard" class="content-section">
+            <!-- Global Alerts -->
+            {% if global_alerts %}
+            <div style="margin-bottom: 2rem;">
+                {% for alert in global_alerts %}
+                <div style="background: #000; color: white; padding: 1rem 1.5rem; border-radius: 12px; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 1rem;">
+                    <i class="fa-solid fa-circle-exclamation" style="font-size: 1.2rem; color: #f59e0b;"></i>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 800; font-size: 0.85rem; text-transform: uppercase;">{{ alert.title }}</div>
+                        <div style="font-size: 0.8rem; color: rgba(255,255,255,0.8);">{{ alert.content }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="card">
+                <h3>Recent Communications</h3>
+                {% for msg in messages %}
+                <div style="padding: 1rem 0; border-bottom: 1px solid #eee;">
+                    <strong>{{ msg.sender.userprofile.formatted_name }}:</strong> {{ msg.content }}
+                </div>
+                {% empty %}
+                <p>No recent messages.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div id="section-classrooms" class="content-section" style="display: none;">
+            <div class="card">
+                <h3>Your Classrooms</h3>
+                <div class="classroom-list">
+                    {% for class in classrooms %}
+                    <a href="{% url 'classroom_detail' class.id %}"
+                        style="text-decoration: none; color: inherit; display: block; margin-bottom: 1rem;">
+                        <div class="class-card">
+                            {{ class.name }}<br>
+                            <span style="font-size: 0.8rem; font-weight: 400;">Section: {{ class.section }}</span>
+                        </div>
+                    </a>
+                    {% empty %}
+                    <p>No classrooms assigned.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div id="section-messages" class="content-section" style="display: none;">
+            <div class="card">
+                <h3>Send a Message</h3>
+                <form action="{% url 'send_message' %}" method="POST">
+                    {% csrf_token %}
+                    <div style="margin-bottom: 1rem;">
+                        <label style="display: block; font-weight: 700; margin-bottom: 0.5rem;">Select Recipient</label>
+                        <select name="receiver_id" style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd;" required>
+                            <option value="">-- Select a User --</option>
+                            {% for class in classrooms %}
+                                <optgroup label="{{ class.name }}">
+                                    <!-- This list could be long, but for demonstration we use a simpler approach or the student list -->
+                                    <option value="Select from Students list" disabled>Send from Students list instead</option>
+                                </optgroup>
+                            {% endfor %}
+                        </select>
+                        <p style="font-size: 0.8rem; color: #6b7280; margin-top: 0.5rem;">Tip: You can also send messages directly from the <a href="{% url 'student_list' %}"><b>Students List</b></a>.</p>
+                    </div>
+                    <div style="margin-bottom: 1rem;">
+                        <label style="display: block; font-weight: 700; margin-bottom: 0.5rem;">Message Content</label>
+                        <textarea name="content" style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd; min-height: 100px;" placeholder="Type your message here..." required></textarea>
+                    </div>
+                    <button type="submit" style="background: var(--primary-black); color: white; padding: 0.8rem 1.5rem; border: none; border-radius: 8px; font-weight: 700; cursor: pointer;">Send Message</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h3>All Messages</h3>
+                {% for msg in messages %}
+                <div style="padding: 1.2rem; background: #f9fafb; border-radius: 12px; margin-bottom: 1rem; border: 1px solid #e5e7eb;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <strong style="color: var(--primary-black);">{{ msg.sender.userprofile.formatted_name }}</strong>
+                        <span style="font-size: 0.75rem; color: #6b7280;">{{ msg.timestamp|date:"M d, Y h:i A" }}</span>
+                    </div>
+                    <div style="font-size: 0.9rem; color: #374151;">{{ msg.content }}</div>
+                </div>
+                {% empty %}
+                <p style="text-align: center; color: #9ca3af; padding: 2rem;">No messages yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div id="section-profile" class="content-section" style="display: none;">
+            <div class="card">
+                <h3>Profile Settings</h3>
+                <form action="{% url 'profile_update' %}" method="POST" style="max-width: 500px;">
+                    {% csrf_token %}
+                    <div style="margin-bottom: 1rem;">
+                        <label style="display: block; font-weight: 700; margin-bottom: 0.5rem;">Full Name</label>
+                        <input type="text" name="name" value="{{ user.get_full_name }}" style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd;" required>
+                    </div>
+                    <div style="margin-bottom: 1rem;">
+                        <label style="display: block; font-weight: 700; margin-bottom: 0.5rem;">Email Address</label>
+                        <input type="email" name="email" value="{{ user.email }}" style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd;" required>
+                    </div>
+                    <button type="submit" style="background: var(--primary-black); color: white; padding: 0.8rem 1.5rem; border: none; border-radius: 8px; font-weight: 700; cursor: pointer;">Update Profile</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        const sidebarBurger = document.getElementById('sidebarBurger');
+        const headerBurger = document.getElementById('headerBurger');
+        const sidebar = document.querySelector('.sidebar');
+        const sectionTitle = document.getElementById('sectionTitle');
+
+        function updateBurgerVisibility() {
+            if (window.innerWidth <= 768) {
+                headerBurger.style.display = 'flex';
+            } else {
+                if (sidebar.classList.contains('collapsed')) {
+                    headerBurger.style.display = 'flex';
+                } else {
+                    headerBurger.style.display = 'none';
+                }
+            }
+        }
+
+        function toggleSidebar() {
+            if (window.innerWidth > 768) {
+                sidebar.classList.toggle('collapsed');
+            } else {
+                sidebar.classList.toggle('active');
+            }
+            updateBurgerVisibility();
+        }
+
+        if (sidebarBurger) sidebarBurger.addEventListener('click', toggleSidebar);
+        if (headerBurger) headerBurger.addEventListener('click', toggleSidebar);
+
+        window.addEventListener('resize', updateBurgerVisibility);
+        updateBurgerVisibility();
+        
+        // Section Navigation
+        const navLinks = document.querySelectorAll('.sidebar nav a[data-section]');
+        const sectionTitles = {
+            'dashboard': 'Teacher Dashboard',
+            'classrooms': 'My Classrooms',
+            'messages': 'Messages & Inquiries',
+            'profile': 'Profile Settings'
+        };
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                const target = this.getAttribute('data-section');
+                if (!target) return;
+                
+                e.preventDefault();
+                
+                // Update nav UI
+                navLinks.forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Show section
+                document.querySelectorAll('.content-section').forEach(sec => sec.style.display = 'none');
+                const targetSec = document.getElementById('section-' + target);
+                if (targetSec) targetSec.style.display = 'block';
+                
+                // Update title
+                sectionTitle.textContent = sectionTitles[target] || 'Dashboard';
+                
+                // Close sidebar on mobile
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('active');
+                }
+            });
+        });
+
+        // Handle window resize for burger visibility
+        function handleResize() {
+            if (window.innerWidth <= 768) {
+                headerBurger.style.display = 'flex';
+            } else {
+                headerBurger.style.display = 'none';
+            }
+        }
+        window.addEventListener('resize', handleResize);
+        handleResize(); // Initial call
+        
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) {
+                if (sidebar.classList.contains('active') && !sidebar.contains(e.target) && !sidebarBurger.contains(e.target) && !headerBurger.contains(e.target)) {
+                    sidebar.classList.remove('active');
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

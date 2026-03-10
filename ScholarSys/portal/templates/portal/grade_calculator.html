@@ -1,0 +1,447 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScholarSys+ | Grade Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-black: #000000;
+            --bg-white: #ffffff;
+            --bg-light: #f9fafb;
+            --text-main: #111827;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-light);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            color: var(--text-main);
+        }
+
+        .sidebar {
+            width: 240px;
+            background: var(--primary-black);
+            color: white;
+            padding: 1.5rem 1rem;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1000;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .sidebar.collapsed {
+            width: 0;
+            padding: 1.5rem 0;
+            margin: 0;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: -240px;
+                height: 100vh;
+                width: 240px;
+                z-index: 2000;
+                opacity: 1;
+                visibility: visible;
+                pointer-events: auto;
+            }
+
+            .sidebar.active {
+                left: 0;
+                box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+            }
+
+            .sidebar.collapsed {
+                width: 240px;
+                left: -240px;
+                opacity: 1;
+                visibility: visible;
+            }
+        }
+
+        .sidebar h2 {
+            font-weight: 800;
+            margin: 0 0 1.5rem 0;
+            letter-spacing: -1.5px;
+            color: white;
+            text-align: center;
+            font-size: 1.8rem;
+            white-space: nowrap;
+        }
+
+        .sidebar nav {
+            flex: 1;
+        }
+
+        .sidebar nav a {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.8rem 1rem;
+            margin-bottom: 0.2rem;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: 0.2s;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        .burger-menu {
+            background: var(--primary-black);
+            color: white;
+            border: none;
+            padding: 0.6rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-right: 1.2rem;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .burger-menu:hover {
+            opacity: 0.9;
+        }
+
+        .sidebar nav a:hover,
+        .sidebar nav a.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .logout-btn {
+            background: #ef4444;
+            color: white !important;
+            text-decoration: none;
+            padding: 0.8rem;
+            text-align: center;
+            border-radius: 8px;
+            font-weight: 700;
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 1.5rem 2.5rem;
+            overflow-y: auto;
+        }
+
+        .top-bar {
+            background: white;
+            padding: 1.25rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .burger-menu {
+            background: var(--primary-black);
+            color: white;
+            border: none;
+            padding: 0.7rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-right: 1.2rem;
+            transition: 0.2s;
+        }
+
+        .top-bar h1 {
+            margin: 0;
+            font-weight: 800;
+            font-size: 1.35rem;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+        }
+
+        .card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            max-width: 600px;
+            margin: 0 auto;
+            border: 1px solid var(--border-color);
+        }
+
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .input-group label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .input-group input {
+            padding: 0.8rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.2s;
+            outline: none;
+            background: var(--bg-light);
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary-black);
+            background: white;
+        }
+
+        .calc-button {
+            grid-column: span 2;
+            background: var(--primary-black);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .calc-button:hover {
+            opacity: 0.9;
+        }
+
+        .result-display {
+            margin-top: 1.5rem;
+            text-align: center;
+            padding: 1.5rem;
+            background: var(--bg-light);
+            border-radius: 12px;
+            border: 2px dashed var(--border-color);
+        }
+
+        .result-display h2 {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            font-weight: 800;
+        }
+
+        #displayGrade {
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: var(--primary-black);
+            display: block;
+            margin-top: 0.2rem;
+            letter-spacing: -2px;
+        }
+
+        .weights-info {
+            margin-top: 2rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .weight-tag {
+            background: var(--bg-light);
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar">
+        <h2><span style="color: white;">Scholar</span><span style="color: #6b7280;">Sys+</span></h2>
+        <nav>
+            <a href="{% url 'dashboard' %}"><i class="fa-solid fa-house"></i> Dashboard</a>
+            <a href="{% url 'student_list' %}"><i class="fa-solid fa-user-graduate"></i> Students</a>
+            <a href="{% url 'submissions_list' %}"><i class="fa-solid fa-file-import"></i> Submissions</a>
+            <a href="{% url 'calculate_grade' %}" class="active"><i class="fa-solid fa-calculator"></i> Grade
+                Calculator</a>
+            <a href="{% url 'raw_scores' %}"><i class="fa-solid fa-file-invoice"></i> Raw Score Report</a>
+            <a href="#"><i class="fa-solid fa-envelope"></i> Messages</a>
+            <a href="/logout/" class="logout-btn">
+                <i class="fa-solid fa-right-from-bracket"></i> Logout
+            </a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="top-bar">
+            <div style="display: flex; align-items: center;">
+                <button class="burger-menu" id="burgerToggle">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <h1>Grade Calculator</h1>
+            </div>
+            <div style="text-align: right;">
+                <span style="font-weight: 800; color: #000;">{{ user.username }}</span><br>
+                <span style="font-size: 0.8rem; color: #6b7280; font-weight: 600;">{{ user.userprofile.role|upper }}
+                    PORTAL</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <form id="gradeForm" method="POST">
+                {% csrf_token %}
+                <div class="calculator-grid">
+                    <div class="input-group">
+                        <label for="quiz">Quiz Score (%)</label>
+                        <input type="number" id="quiz" name="quiz" placeholder="e.g. 85" min="0" max="100" step="0.01"
+                            oninput="computeRealTime()">
+                    </div>
+                    <div class="input-group">
+                        <label for="exam">Exam Score (%)</label>
+                        <input type="number" id="exam" name="exam" placeholder="e.g. 90" min="0" max="100" step="0.01"
+                            oninput="computeRealTime()">
+                    </div>
+                    <div class="input-group">
+                        <label for="activity">Activity Score (%)</label>
+                        <input type="number" id="activity" name="activity" placeholder="e.g. 88" min="0" max="100"
+                            step="0.01" oninput="computeRealTime()">
+                    </div>
+                    <div class="input-group">
+                        <label for="assignment">Assignment Score (%)</label>
+                        <input type="number" id="assignment" name="assignment" placeholder="e.g. 95" min="0" max="100"
+                            step="0.01" oninput="computeRealTime()">
+                    </div>
+                    <button type="submit" class="calc-button">Verify with Server</button>
+                </div>
+            </form>
+
+            <div class="result-display">
+                <h2>Calculated Grade</h2>
+                <span id="displayGrade">{% if final_grade %}{{ final_grade }}{% else %}0.00{% endif %}</span>
+            </div>
+
+            <div class="weights-info">
+                <span class="weight-tag">Quiz: 20%</span>
+                <span class="weight-tag">Exam: 40%</span>
+                <span class="weight-tag">Activity: 30%</span>
+                <span class="weight-tag">Assignment: 10%</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Client-side formula implementation
+        function computeRealTime() {
+            const q = parseFloat(document.getElementById('quiz').value) || 0;
+            const e = parseFloat(document.getElementById('exam').value) || 0;
+            const ac = parseFloat(document.getElementById('activity').value) || 0;
+            const as = parseFloat(document.getElementById('assignment').value) || 0;
+
+            const weights = { q: 0.2, e: 0.4, ac: 0.3, as: 0.1 };
+            const total = (q * weights.q) + (e * weights.e) + (ac * weights.ac) + (as * weights.as);
+
+            document.getElementById('displayGrade').innerText = total.toFixed(2);
+        }
+
+        // AJAX Server-side calculation verification
+        document.getElementById('gradeForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const url = "{% url 'calculate_grade' %}?ajax=1";
+
+            fetch(url, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.final_grade !== undefined) {
+                        document.getElementById('displayGrade').innerText = data.final_grade.toFixed(2);
+                        // Add a subtle animation to show it was updated by server
+                        const display = document.getElementById('displayGrade');
+                        display.style.color = '#000';
+                        display.style.transform = 'scale(1.1)';
+                        setTimeout(() => {
+                            display.style.color = 'var(--primary-black)';
+                            display.style.transform = 'scale(1)';
+                        }, 500);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("Verification failed. Please check your inputs.");
+                });
+        });
+
+        // Sidebar Toggle
+        const burgerToggle = document.getElementById('burgerToggle');
+        const sidebar = document.querySelector('.sidebar');
+
+        if (burgerToggle && sidebar) {
+            burgerToggle.addEventListener('click', () => {
+                if (window.innerWidth > 768) {
+                    sidebar.classList.toggle('collapsed');
+                } else {
+                    sidebar.classList.toggle('active');
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                if (window.innerWidth <= 768) {
+                    if (sidebar.classList.contains('active') && !sidebar.contains(e.target) && !burgerToggle.contains(e.target)) {
+                        sidebar.classList.remove('active');
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

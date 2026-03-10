@@ -1,0 +1,159 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScholarSys+ | Welcome</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-black: #000000;
+            --card-white: #ffffff;
+            --text-main: #111827;
+            --text-muted: #6b7280;
+            --border-light: #e5e7eb;
+            --accent-black: #000000;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-black) !important;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .login-card {
+            background: var(--card-white) !important;
+            padding: 3rem 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            width: 420px;
+            text-align: center;
+            animation: fadeIn 0.6s ease-out;
+            border: 1px solid var(--border-light);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        h1 {
+            color: var(--text-main);
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            letter-spacing: -3px;
+            font-size: 2.5rem;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .portal-options {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 1.2rem;
+            background: var(--accent-black) !important;
+            color: white !important;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-sizing: border-box;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-btn.secondary {
+            background: white !important;
+            color: var(--accent-black) !important;
+            border: 2px solid var(--accent-black) !important;
+        }
+
+        .login-btn.secondary:hover {
+            background: #f9fafb !important;
+        }
+
+        .footer {
+            margin-top: 2.5rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid #f3f4f6;
+            padding-top: 1.5rem;
+        }
+
+        .footer a {
+            color: var(--accent-black);
+            text-decoration: none;
+            font-weight: 700;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-card">
+        <h1>Scholar<span style="color: #6b7280;">Sys+</span></h1>
+        <p class="subtitle">Unified Academic Management System</p>
+
+        {% if continue_as %}
+        <div style="margin-top: 1.5rem;">
+            <a href="{% url redirect_url %}" class="login-btn">Continue to Dashboard</a>
+            <div style="margin-top: 1rem;">
+                <a href="{% url 'logout' %}"
+                    style="color: var(--text-muted); font-size: 0.8rem; text-decoration: none; font-weight: 600;">Switch
+                    Account</a>
+            </div>
+        </div>
+        {% else %}
+        <div class="portal-options">
+            <a href="{% url 'student_login' %}" class="login-btn">
+                <i class="fa-solid fa-user-graduate"></i> Sign In as Student
+            </a>
+            <a href="{% url 'teacher_login' %}" class="login-btn secondary">
+                <i class="fa-solid fa-chalkboard-user"></i> Sign In as Teacher
+            </a>
+        </div>
+        {% endif %}
+
+        <div class="footer">
+            Don't have an account? <a href="/signup/">Sign up here</a><br><br>
+            <span style="font-size: 0.75rem; opacity: 0.7;">&copy; 2026 ScholarSys+ Inc.</span>
+        </div>
+    </div>
+</body>
+
+</html>

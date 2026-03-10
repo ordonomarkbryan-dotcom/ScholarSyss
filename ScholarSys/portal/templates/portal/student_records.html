@@ -1,0 +1,513 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScholarSys+ | Student Records: {{ student.userprofile.formatted_name }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-black: #000000;
+            --bg-white: #ffffff;
+            --bg-light: #f9fafb;
+            --text-main: #111827;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-light);
+            display: flex;
+            height: 100vh;
+            color: var(--text-main);
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 240px;
+            background: var(--primary-black);
+            color: white;
+            padding: 1.5rem 1rem;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1000;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .sidebar.collapsed {
+            width: 0;
+            padding: 1.5rem 0;
+            margin: 0;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: -240px;
+                height: 100vh;
+                width: 240px;
+                z-index: 2000;
+                opacity: 1;
+                visibility: visible;
+                pointer-events: auto;
+            }
+
+            .sidebar.active {
+                left: 0;
+                box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+            }
+
+            .sidebar.collapsed {
+                width: 240px;
+                left: -240px;
+                opacity: 1;
+                visibility: visible;
+            }
+        }
+
+        .sidebar h2 {
+            font-weight: 800;
+            margin: 0 0 1.5rem 0;
+            letter-spacing: -1.5px;
+            color: white;
+            text-align: center;
+            font-size: 1.8rem;
+            white-space: nowrap;
+        }
+
+        .sidebar nav {
+            flex: 1;
+        }
+
+        .sidebar nav a {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.8rem 1rem;
+            margin-bottom: 0.2rem;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: 0.2s;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        .sidebar nav a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .logout-btn {
+            background: #ef4444;
+            color: white !important;
+            text-decoration: none;
+            padding: 0.8rem;
+            text-align: center;
+            border-radius: 8px;
+            font-weight: 700;
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 1.5rem 2.5rem;
+            overflow-y: auto;
+        }
+
+        .profile-header {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            background: var(--primary-black);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 800;
+            color: white;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.25rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-value {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--primary-black);
+            margin-bottom: 0.1rem;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .tab-content {
+            display: grid;
+            grid-template-columns: 1.6fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            border: 1px solid var(--border-color);
+        }
+
+        .card h3 {
+            margin-top: 0;
+            color: var(--primary-black);
+            border-bottom: 2px solid var(--primary-black);
+            padding-bottom: 0.6rem;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            padding: 0.8rem;
+            border-bottom: 1px solid var(--border-color);
+            letter-spacing: 0.05em;
+            font-weight: 700;
+        }
+
+        td {
+            padding: 0.8rem;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 0.85rem;
+        }
+
+        .grade-badge {
+            font-weight: 800;
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+        }
+
+        .grade-high {
+            background: var(--primary-black);
+            color: white;
+        }
+
+        .grade-med {
+            background: #f3f4f6;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+
+        .grade-low {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .attendance-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        .status-present {
+            color: #000 !important;
+        }
+
+        .status-absent {
+            color: #ef4444 !important;
+        }
+
+        .status-late {
+            color: #6b7280 !important;
+        }
+
+        .bg-present {
+            background-color: #000 !important;
+        }
+
+        .bg-absent {
+            background-color: #ef4444 !important;
+        }
+
+        .bg-late {
+            background-color: #6b7280 !important;
+        }
+
+        .btn-delete {
+            color: #ef4444;
+            font-weight: 800;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+        .btn-delete:hover {
+            opacity: 0.7;
+        }
+
+        .flex-row {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.8rem;
+        }
+
+        .burger-menu {
+            background: var(--primary-black);
+            color: white;
+            border: none;
+            padding: 0.6rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-right: 1.2rem;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: fit-content;
+        }
+
+        .burger-menu:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar">
+        <h2><span style="color: white;">Scholar</span><span style="color: #6b7280;">Sys+</span></h2>
+        <nav>
+            <a href="{% url 'dashboard' %}"><i class="fa-solid fa-house"></i> Dashboard</a>
+            <a href="{% url 'student_list' %}"><i class="fa-solid fa-users"></i> Students</a>
+            <a href="{% url 'submissions_list' %}"><i class="fa-solid fa-file-import"></i> Submissions</a>
+            <a href="{% url 'calculate_grade' %}"><i class="fa-solid fa-calculator"></i> Grade Calculator</a>
+            <a href="#"><i class="fa-solid fa-envelope"></i> Messages</a>
+            <a href="/logout/" class="logout-btn">
+                <i class="fa-solid fa-right-from-bracket"></i> Logout
+            </a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="profile-header">
+            <button class="burger-menu" id="burgerToggle" style="margin-right: 1rem;">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            <div class="profile-avatar">{{ student.first_name.0 }}{{ student.last_name.0 }}</div>
+            <div style="flex: 1;">
+                <h1 style="margin:0; font-size: 1.8rem; font-weight: 800; letter-spacing: -1px;">
+                    {{ student.userprofile.formatted_name }}</h1>
+                <p style="margin: 0.3rem 0; color: #6b7280; font-weight: 600; font-size: 0.9rem;">
+                    <i class="fa-solid fa-id-card"></i> ID: {{ student.userprofile.student_id|default:"N/A" }} |
+                    <i class="fa-solid fa-layer-group"></i> {{ student.userprofile.section }} |
+                    <i class="fa-solid fa-envelope"></i> {{ student.email }}
+                </p>
+                <div class="flex-row">
+                    <span class="grade-badge grade-high">ACTIVE STATUS</span>
+                    <span class="grade-badge grade-med">ENROLLED 2025-2026</span>
+                </div>
+            </div>
+            <a href="{% url 'student_list' %}"
+                style="background: white; border: 1px solid #e5e7eb; color: #000; padding: 0.7rem 1.2rem; border-radius: 8px; text-decoration: none; font-weight: 800; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">&larr;
+                Return to Directory</a>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">{{ attendance_rate|floatformat:2 }}%</div>
+                <div class="stat-label">Attendance Rate</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ avg_grade|floatformat:2 }}</div>
+                <div class="stat-label">GWA Equivalent</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ performances.count }}</div>
+                <div class="stat-label">Recorded Activities</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ attendance.count }}</div>
+                <div class="stat-label">Class Days</div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="card">
+                <h3>Academic Performance History</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;"></th>
+                            <th>Issued</th>
+                            <th>Due Date</th>
+                            <th>Subject</th>
+                            <th>Type</th>
+                            <th>Score</th>
+                            <th>Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for perf in performances %}
+                        <tr>
+                            <td style="text-align: center;">
+                                <a href="{% url 'delete_performance' perf.id %}"
+                                    onclick="return confirm('Delete this record?')" class="btn-delete"
+                                    title="Delete Record">
+                                    <i class="fa-solid fa-circle-xmark"></i>
+                                </a>
+                            </td>
+                            <td style="font-size: 0.8rem; color: #64748b;">{{ perf.date|date:"F d, Y" }}</td>
+                            <td style="font-size: 0.8rem; color: #ef4444; font-weight: 600;">{% if perf.due_date %}{{
+                                perf.due_date|date:"F d, Y" }}{% else %}-{% endif %}</td>
+                            <td style="font-weight: 600;">{{ perf.subject }}</td>
+                            <td>{{ perf.get_performance_type_display }}</td>
+                            <td>
+                                <span
+                                    class="grade-badge {% if perf.grade >= 90 %}grade-high{% elif perf.grade >= 75 %}grade-med{% else %}grade-low{% endif %}">
+                                    {% if perf.submissions.exists %}
+                                    {{ perf.grade|floatformat:2 }}
+                                    {% else %}
+                                    Pending
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td style="color: #64748b; font-weight: 500;">{{ perf.remarks|default:"-" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 2rem; color: #9ca3af;">
+                                <i class="fa-solid fa-clipboard-list"
+                                    style="font-size: 1.5rem; display: block; margin-bottom: 0.5rem;"></i>
+                                No assignments recorded yet.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <h3>Attendance Log</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;"></th>
+                            <th>Date</th>
+                            <th>Course</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for att in attendance %}
+                        <tr>
+                            <td style="text-align: center;">
+                                <a href="{% url 'delete_attendance' att.id %}"
+                                    onclick="return confirm('Delete this attendance record?')" class="btn-delete"
+                                    title="Delete Record">
+                                    <i class="fa-solid fa-circle-xmark"></i>
+                                </a>
+                            </td>
+                            <td>{{ att.date|date:"F d, Y" }}</td>
+                            <td style="font-size: 0.8rem;">{{ att.classroom.course_number }}</td>
+                            <td>
+                                <span style="font-weight: 600; text-transform: capitalize;"
+                                    class="status-{{ att.status }}">
+                                    <span class="attendance-dot bg-{{ att.status }}"></span>
+                                    {{ att.status }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" style="text-align:center; padding: 2rem; color: #94a3b8;">No attendance logs
+                                yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const burgerToggle = document.getElementById('burgerToggle');
+        const sidebar = document.querySelector('.sidebar');
+
+        if (burgerToggle && sidebar) {
+            burgerToggle.addEventListener('click', () => {
+                if (window.innerWidth > 768) {
+                    sidebar.classList.toggle('collapsed');
+                } else {
+                    sidebar.classList.toggle('active');
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                if (window.innerWidth <= 768) {
+                    if (sidebar.classList.contains('active') && !sidebar.contains(e.target) && !burgerToggle.contains(e.target)) {
+                        sidebar.classList.remove('active');
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

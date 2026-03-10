@@ -1,0 +1,606 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScholarSys+ | Sign Up</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-black: #000000;
+            --bg-white: #ffffff;
+            --bg-light: #f9fafb;
+            --text-main: #111827;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-light);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            color: var(--text-main);
+        }
+
+        .login-card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            width: 400px;
+            text-align: center;
+            animation: fadeIn 0.5s ease-out;
+            border: 1px solid var(--border-color);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            color: var(--primary-black);
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            letter-spacing: -2px;
+            font-size: 2.2rem;
+            text-transform: uppercase;
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+            text-align: left;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            color: var(--text-muted);
+            margin-bottom: 0.3rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            padding-right: 45px;
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-main);
+            box-sizing: border-box;
+            outline: none;
+            transition: 0.2s;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        select option {
+            background: white;
+            color: var(--text-main);
+        }
+
+        input:focus,
+        select:focus {
+            background: white;
+            border-color: var(--primary-black);
+            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: 0.2s;
+            z-index: 10;
+            padding: 5px;
+        }
+
+        .toggle-password:hover {
+            color: var(--primary-black);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary-black);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 800;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .login-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .footer {
+            margin-top: 1.5rem;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .footer a {
+            color: var(--primary-black);
+            text-decoration: none;
+            font-weight: 700;
+            border-bottom: 2px solid var(--primary-black);
+        }
+
+        .password-hint {
+            display: block;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 0.4rem;
+            font-weight: 500;
+        }
+
+        .strength-meter {
+            height: 4px;
+            width: 100%;
+            background: var(--border-color);
+            border-radius: 2px;
+            margin-top: 8px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .strength-bar {
+            height: 100%;
+            width: 0%;
+            transition: 0.3s;
+        }
+
+        .caps-warning {
+            color: #ef4444;
+            font-size: 0.7rem;
+            margin-top: 5px;
+            display: none;
+            font-weight: 700;
+        }
+
+        .consent-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-top: 1.25rem;
+            text-align: left;
+        }
+
+        .consent-group input {
+            width: auto;
+            margin-top: 3px;
+            padding: 0;
+            height: auto;
+        }
+
+        .consent-group label {
+            font-size: 0.72rem;
+            font-weight: 500;
+            line-height: 1.4;
+            color: var(--text-muted);
+            text-transform: none;
+            letter-spacing: normal;
+        }
+
+        .login-btn:disabled {
+            background: #e5e7eb;
+            color: #9ca3af;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: 800;
+            margin-bottom: 5px;
+            background: var(--primary-black);
+            color: white;
+            text-transform: uppercase;
+        }
+
+        .msg-alert {
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            margin-bottom: 0.8rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            color: white;
+            font-weight: 600;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .msg-error {
+            background: rgba(0, 0, 0, 0.95);
+            border: 1px solid #ef4444;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-card">
+
+        <h1 style="font-size: 2.22rem; letter-spacing: -2px; margin-bottom: 0.5rem; margin-top: 0; font-weight: 900;">
+            <span style="color: black;">Scholar</span><span style="color: #6b7280;">Sys+</span>
+        </h1>
+        <p
+            style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 2rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">
+            Join our academic community today</p>
+
+
+
+        {% if messages %}
+        <div id="messages-container"
+            style="position: fixed; top: 20px; right: 20px; z-index: 1000; transition: opacity 0.5s ease, transform 0.5s ease;">
+            {% for message in messages %}
+            <div class="msg-alert {% if 'success' not in message.tags %}msg-error{% endif %}">
+                {% if 'success' in message.tags %}
+                <i class="fa-solid fa-circle-check" style="margin-right: 8px;"></i>
+                {% else %}
+                <i class="fa-solid fa-circle-exclamation" style="margin-right: 8px;"></i>
+                {% endif %}
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="input-group">
+                <label>Full Name</label>
+                <input type="text" name="full_name" id="full_name" placeholder="Enter Full Name"
+                    value="{{ form_data.full_name|default:'' }}" required>
+            </div>
+            <div class="input-group">
+                <div id="role-indicator" class="role-badge" style="display: none;"></div>
+                <label>Username</label>
+                <input type="text" name="username" id="username" placeholder="Pick a username"
+                    value="{{ form_data.username|default:'' }}" required>
+            </div>
+            <div id="student-id-group" class="input-group" style="display: none;">
+                <label>Student ID</label>
+                <input type="text" name="student_id" id="student_id" placeholder="XXX-XXXX-X"
+                    value="{{ form_data.student_id|default:'' }}">
+                <div id="username-hint" class="password-hint">
+                    <i class="fa-solid fa-id-card"></i> Format: 241-0325-1
+                </div>
+            </div>
+            <div id="section-group" class="input-group" style="display: none;">
+                <label>Section</label>
+                <input type="text" name="section" id="section" placeholder="e.g. BSIS IIB"
+                    value="{{ form_data.section|default:'' }}">
+            </div>
+            <div class="input-group">
+                <label>Email Address</label>
+                <input type="email" name="email" id="email" placeholder="Enter your email"
+                    value="{{ form_data.email|default:'' }}" required>
+                <div id="email-hint" class="password-hint" style="display: none;"></div>
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <div class="password-wrapper">
+                    <input type="password" name="password" id="password" placeholder="••••••••" required>
+                    <i class="fa-solid fa-eye toggle-password" id="togglePassword"></i>
+                </div>
+                <div id="caps-warning" class="caps-warning">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Caps Lock is ON
+                </div>
+                <div id="strength-meter" class="strength-meter">
+                    <div id="strength-bar" class="strength-bar"></div>
+                </div>
+                <div id="password-hint" class="password-hint">
+                    <i class="fa-solid fa-circle-info" style="font-size: 0.7rem; margin-right: 4px;"></i>
+                    Must be 8-32 chars with letters and numbers
+                </div>
+            </div>
+            <div class="input-group">
+                <label>Occupation (Teacher or Student)</label>
+                <select name="role" id="role-select" required>
+                    <option value="" disabled {% if not form_data.role %}selected{% endif %}>Select Occupation</option>
+                    <option value="student" {% if form_data.is_student %}selected{% endif %}>Student</option>
+                    <option value="teacher" {% if form_data.is_teacher %}selected{% endif %}>Teacher</option>
+                </select>
+            </div>
+
+            <div class="consent-group">
+                <input type="checkbox" id="consent-check" required>
+                <label for="consent-check">
+                    I agree to the <a href="#" style="text-decoration: underline;">Terms of Service</a> and
+                    consent to the collection of my data in accordance with the
+                    <a href="#" style="text-decoration: underline;">Data Privacy Act of 2012 (RA 10173)</a>.
+                </label>
+            </div>
+
+            <button type="submit" id="submit-btn" class="login-btn">Create Account</button>
+        </form>
+        <div class="footer">
+            Already have an account? <a href="/">Login here</a>
+        </div>
+    </div>
+
+    <script>
+        // Form elements
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordField = document.getElementById('password');
+        const roleSelect = document.getElementById('role-select');
+        const usernameInput = document.getElementById('username');
+        const studentIdInput = document.getElementById('student_id');
+        const studentIdGroup = document.getElementById('student-id-group');
+        const sectionInput = document.getElementById('section');
+        const sectionGroup = document.getElementById('section-group');
+        const usernameHint = document.getElementById('username-hint');
+        const roleIndicator = document.getElementById('role-indicator');
+        const emailInput = document.getElementById('email');
+        const emailHint = document.getElementById('email-hint');
+        const consentCheck = document.getElementById('consent-check');
+        const submitBtn = document.getElementById('submit-btn');
+        const capsWarning = document.getElementById('caps-warning');
+        const strengthMeter = document.getElementById('strength-meter');
+        const strengthBar = document.getElementById('strength-bar');
+        const signupForm = document.querySelector('form');
+        const passwordHint = document.getElementById('password-hint');
+        const nameInput = document.getElementById('full_name');
+
+        // Password visibility toggle
+        if (togglePassword && passwordField) {
+            togglePassword.addEventListener('click', function () {
+                const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordField.setAttribute('type', type);
+                this.classList.toggle('fa-eye');
+                this.classList.toggle('fa-eye-slash');
+            });
+        }
+
+        // Central Validation Function
+        function checkFormValidity() {
+            const role = roleSelect.value;
+            const nameValid = nameInput.value.trim().length >= 2;
+            const usernameValid = usernameInput.value.replace(/\s/g, '').length >= 4;
+            const consentGiven = consentCheck.checked;
+
+            // Password Validation
+            const passwordVal = passwordField.value;
+            const passwordPattern = /^(?=.*[a-zA-Z])(?=.*\d).{8,32}$/;
+            const passwordValid = passwordPattern.test(passwordVal);
+
+            // Email Validation
+            const emailVal = emailInput.value;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            let emailValid = false;
+
+            if (emailRegex.test(emailVal)) {
+                emailValid = true;
+            }
+
+            // Student/Teacher Specific Validation
+            let specificValid = false;
+            if (role === 'student') {
+                const studentIdValid = /^\d{3}-\d{4}-\d{1}$/.test(studentIdInput.value);
+                const sectionValid = sectionInput.value.trim().length > 0;
+                specificValid = studentIdValid && sectionValid;
+            } else if (role === 'teacher') {
+                specificValid = true; // No extra fields for teachers
+            } else {
+                specificValid = false; // No role selected
+            }
+
+            // Update Button State
+            const isValid = nameValid && usernameValid && emailValid && passwordValid && consentGiven && specificValid;
+
+            if (isValid) {
+                submitBtn.style.background = 'var(--primary-black)';
+                submitBtn.style.opacity = '1';
+                submitBtn.style.cursor = 'pointer';
+            } else {
+                submitBtn.style.background = '#e5e7eb';
+                submitBtn.style.opacity = '0.7';
+                submitBtn.style.cursor = 'pointer'; // let them click so they get HTML5 errors
+            }
+
+            return isValid;
+        }
+
+        // Attach listeners to all inputs to trigger validation
+        const addListener = (el, type = 'input') => {
+            if (el) el.addEventListener(type, checkFormValidity);
+        };
+
+        addListener(nameInput);
+        addListener(usernameInput);
+        addListener(emailInput);
+        addListener(passwordField);
+        addListener(consentCheck, 'change');
+        addListener(roleSelect, 'change');
+        addListener(studentIdInput);
+        addListener(sectionInput);
+
+        // Individual Field Logic (UI Feedback only, not state management)
+
+        // Role Change UI
+        roleSelect.addEventListener('change', function () {
+            const role = this.value;
+            roleIndicator.style.display = 'inline-block';
+            roleIndicator.textContent = role.toUpperCase();
+
+            if (role === 'student') {
+                studentIdGroup.style.display = 'block';
+                sectionGroup.style.display = 'block';
+                studentIdInput.required = true;
+                sectionInput.required = true;
+            } else {
+                studentIdGroup.style.display = 'none';
+                sectionGroup.style.display = 'none';
+                studentIdInput.required = false;
+                sectionInput.required = false;
+            }
+            // Trigger feedback updates
+            updateEmailFeedback();
+            checkFormValidity();
+        });
+
+        // Email Feedback
+        emailInput.addEventListener('input', updateEmailFeedback);
+
+        function updateEmailFeedback() {
+            const val = emailInput.value;
+            const role = roleSelect.value;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (val.length === 0) {
+                emailHint.style.display = 'none';
+                return;
+            }
+
+            if (!emailRegex.test(val)) {
+                emailHint.style.display = 'block';
+                emailHint.style.color = '#fca5a5';
+                emailHint.innerHTML = '<i class=\"fa-solid fa-circle-exclamation\"></i> Invalid email format';
+                return;
+            }
+
+            // Email is valid
+            emailHint.style.display = 'none';
+        }
+
+        // Username Formatting
+        usernameInput.addEventListener('input', function () {
+            this.value = this.value.replace(/\s/g, '');
+        });
+
+        // Student ID Formatting
+        studentIdInput.addEventListener('input', function (e) {
+            let val = this.value.replace(/\D/g, '');
+            if (val.length > 7) {
+                val = val.substring(0, 3) + '-' + val.substring(3, 7) + '-' + val.substring(7, 8);
+            } else if (val.length > 3) {
+                val = val.substring(0, 3) + '-' + val.substring(3, 7);
+            }
+            this.value = val;
+        });
+
+        // Password Strength & Caps Lock (same as before)
+        passwordField.addEventListener('input', function () {
+            const val = this.value;
+
+            // Entropy Calculation and Visuals
+            if (val.length > 0) {
+                strengthMeter.style.display = 'block';
+                let pool = 0;
+                if (/[a-z]/.test(val)) pool += 26;
+                if (/[A-Z]/.test(val)) pool += 26;
+                if (/\d/.test(val)) pool += 10;
+                if (/[^a-zA-Z\d]/.test(val)) pool += 32;
+
+                const entropy = val.length * Math.log2(pool || 1);
+
+                let color = '#ef4444';
+                let width = '20%';
+                if (entropy > 60) { color = '#22c55e'; width = '100%'; }
+                else if (entropy > 40) { color = '#f59e0b'; width = '60%'; }
+                else if (entropy > 20) { color = '#fb7185'; width = '40%'; }
+
+                strengthBar.style.width = width;
+                strengthBar.style.background = color;
+            } else {
+                strengthMeter.style.display = 'none';
+            }
+        });
+
+        passwordField.addEventListener('keyup', function (e) {
+            if (e.getModifierState('CapsLock')) {
+                capsWarning.style.display = 'block';
+            } else {
+                capsWarning.style.display = 'none';
+            }
+        });
+
+        // Double check on submit
+        signupForm.addEventListener('submit', function (e) {
+            if (!checkFormValidity()) {
+                e.preventDefault();
+                const card = document.querySelector('.login-card');
+                card.style.animation = 'none';
+                card.offsetHeight;
+                card.style.animation = 'shake 0.4s ease-in-out';
+            }
+        });
+
+        // Auto-hide messages
+        const messagesContainer = document.getElementById('messages-container');
+        if (messagesContainer) {
+            setTimeout(() => {
+                messagesContainer.style.opacity = '0';
+                setTimeout(() => {
+                    messagesContainer.style.display = 'none';
+                }, 500);
+            }, 3000);
+        }
+
+        // Initialize state on load
+        window.addEventListener('load', () => {
+            if (roleSelect.value) {
+                // Trigger role change logic
+                const role = roleSelect.value;
+                roleIndicator.style.display = 'inline-block';
+                roleIndicator.textContent = role.toUpperCase();
+
+                if (role === 'student') {
+                    studentIdGroup.style.display = 'block';
+                    sectionGroup.style.display = 'block';
+                    studentIdInput.required = true;
+                    sectionInput.required = true;
+                } else {
+                    studentIdGroup.style.display = 'none';
+                    sectionGroup.style.display = 'none';
+                    studentIdInput.required = false;
+                    sectionInput.required = false;
+                }
+            }
+            checkFormValidity();
+        });
+    </script>
+</body>
+
+</html>

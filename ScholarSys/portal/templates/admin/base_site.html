@@ -1,0 +1,19 @@
+{% extends "admin/base.html" %}
+
+{% block title %}{{ title }} | {{ site_title|default:"ScholarSys+ Admin" }}{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">
+        <span style="color: white; font-weight: 800;">Scholar</span><span style="color: #94a3b8;">Sys+</span> <span
+            style="font-weight: 400; opacity: 0.8;">Admin</span>
+    </a>
+</h1>
+{% endblock %}
+
+{% block nav-global %}
+<a href="{% url 'calculate_grade' %}"
+    style="color: white; margin-left: 20px; font-weight: bold; background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 5px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+    <i class="fa fa-calculator"></i> Grade Calculator Tool
+</a>
+{% endblock %}
